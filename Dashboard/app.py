@@ -7,22 +7,16 @@ import plotly.graph_objs as go
 import dash_table
 from dash.dependencies import Input, Output, State
 import pickle
-from sklearn.cluster import KMeans
 import seaborn as sns
 from matplotlib.pyplot import legend,gcf,subplots
 from plotly.tools import mpl_to_plotly
 from src.TSP import TSP
 from imblearn.over_sampling import SMOTE
-
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-
 import geopandas as gpd
-import mlrose
 
 world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
 brazil = world[world['name']=='Brazil']
-l_l =pd.read_csv('../lat_lng.csv')
+l_l =pd.read_csv('lat_lng.csv')
 
 df=pd.DataFrame({'customer_lat':['Please' for i in range(1000)],
     'customer_lng':['Generate' for i in range(1000)],
@@ -38,38 +32,24 @@ def brazilplot():
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=[*external_stylesheets,dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children = [
     html.H1('Warehouse Placement Simulator'),
     html.P('Created by: Gusti Adli Anshari'), 
-    # content_style = {
-    #     'fontFamily': 'Arial',
-    #     'borderBottom': '1px solid #d6d6d6',
-    #     'borderRight': '1px solid #d6d6d6',
-    #     'borderLeft': '1px solid #d6d6d6',
-    #     'padding': '44px'
-    # },
     html.Div(className='row homemade',children=[
         html.Div(className='col-1'),
         html.Div(className='col-10',children=[
             html.Div(className='row homemade',children=[
-                html.Strong(className='col-4',children='Select Warehouse Quantity'),
-                # dcc.Input(
-                #     className='col-3',
-                #     id='n-input',
-                #     type='number',
-                #     value=6,
-                #     min=1,max=100,step=1
-                # )
+                html.Strong(className='col-4',children='Select Warehouse Quantity')
             ]),
             html.Center(dcc.Slider(
                 id='n-slider',
                 min=1,
-                max=100,
+                max=8,
                 step=1,
-                marks={i:str(i) for i in range(1,101,10)},
-                value=6,
+                marks={i:str(i) for i in range(1,9,1)},
+                value=4,
             ))
         ]),
         html.Div(className='col-1')
@@ -79,7 +59,6 @@ app.layout = html.Div(children = [
             html.Img(
                 className='figure',
                 id='cluster-map',
-                src=app.get_asset_url('KMeans6.jpg')
             )
         ])
     ]),
@@ -87,17 +66,6 @@ app.layout = html.Div(children = [
         html.Div(className='col-1'),
         html.Div(className='col-3',children=[
             html.Div(className='column',children=[
-                # html.P(
-                #     className='row',
-                #     children='Number of Customers'
-                # ),
-                # dcc.Input(
-                #     className='row margtop',
-                #     id='n-customer',
-                #     type='number',
-                #     # value=6,
-                #     min=1,max=100,step=1
-                # ),
                 html.P(
                     className='row',
                     children='Number of Warehouses'
@@ -106,24 +74,12 @@ app.layout = html.Div(children = [
                     className='row',
                     id='n-cluster',
                     type='number',
-                    # value=6,
-                    min=1,max=100,step=1
+                    min=1,max=8,step=1
                 )
             ]),
         ]),
         html.Div(className='col-3',children=[
             html.Div(className='column',children=[
-                # html.P(
-                #     className='row',
-                #     children='Number of Sellers'
-                # ),
-                # dcc.Input(
-                #     className='row',
-                #     id='n-seller',
-                #     type='number',
-                #     # value=6,
-                #     min=1,max=100,step=1
-                # ),
                 html.P(
                     className='row',
                     children='Number of Orders'
@@ -132,7 +88,6 @@ app.layout = html.Div(children = [
                     className='row',
                     id='n-order',
                     type='number',
-                    # value=6,
                     min=1,max=1000000000,step=1
                 )
             ])
@@ -163,7 +118,6 @@ app.layout = html.Div(children = [
             n_clicks=0,
             children='Get Generated Data Cluster Information'
         )),
-        # html.Div(className='row'),
         html.Div(className='col-3'),
         html.Div(className='col-6 center',children=[dash_table.DataTable(
             id='cluster-info',
@@ -173,13 +127,36 @@ app.layout = html.Div(children = [
         html.Div(className='col-3')
     ]),
     html.Div(className='row',children=[
-        html.Div(children=[
-            dcc.Graph(
-                className='row center',
-                id='map2',
-                figure=brazilplot()
-            )
-        ])
+        # html.Div(children=[
+        #     dcc.Graph(
+        #         className='row center',
+        #         id='map2',
+        #         figure=brazilplot()
+        #     )
+        # ])
+        html.Div(className = 'col-12',children = dcc.Graph(
+            id = 'map2',
+            config=dict(mapboxAccessToken='pk.eyJ1IjoiZ3N0ZGwiLCJhIjoiY2szOHpvcGM4MGJ3MDNibDMwNWVnam81ZSJ9.UDewXUFso2Tb9S3OlWfsmg'),
+            figure = {
+                'data': [go.Scattermapbox(dict(
+                    # lat=[-15],
+                    # lon=[-56],
+                ))
+                ],
+                'layout':dict(
+                    hovermode='closest',
+                    mapbox=go.layout.Mapbox(
+                        bearing=0,
+                        center=go.layout.mapbox.Center(
+                            lat=-15,
+                            lon=-56
+                        ),
+                        pitch=0,
+                        zoom=1.5
+                    )
+                )  
+            },
+        ))
     ]),
     html.Div(children=[
         html.Center(children=[
@@ -187,8 +164,8 @@ app.layout = html.Div(children = [
             dcc.Input(
                 id='simulate-iter',
                 type='number',
-                value=10,
-                min=1,max=1000000000,step=1
+                value=2,
+                min=2,max=1000000000,step=1
             ),
             html.Div(className='col-5'),
             html.Button(
@@ -217,7 +194,7 @@ app.layout = html.Div(children = [
     [Input(component_id='n-slider',component_property='value')]
 )
 def n_slider1(n):
-    return app.get_asset_url(f'KMeans{n}.jpg')
+    return app.get_asset_url(f'km3_iter{n-1}.jpg')
 
 @app.callback(
     Output(component_id='data-generated',component_property='data'),
@@ -236,28 +213,17 @@ def get_data(n_clicks,cluster,order):
                 'cluster':['Warehouse Quantity' for i in range(1000)]
             }).reset_index()
         else:
-            # from random import randint
-            km=pickle.load(open(f'../KMeans_{cluster}.model','rb'))
-            X,y=SMOTE().fit_resample(l_l,km.labels_)
+            labels=pickle.load(open(f'model_data_dump/km3_iter{cluster}.label','rb'))
+            X,y=SMOTE().fit_resample(l_l,labels)
             lat_lng=pd.DataFrame(X,columns=l_l.columns)
             c_lat,c_lng,s_lat,s_lng,clust=[],[],[],[],[]
             while len(c_lat)<order:
                 ac_clus,as_clus=1,2
                 while ac_clus!=as_clus:
-                    # # lat=-33.75116944<=cols['geolocation_lat']<=5.27438888
-                    # # lng=-73.98283055<=cols['geolocation_lng']<=-34.79314722
-                    # ac_lat=np.random.randint(-3375,527)/100
-                    # ac_lng=np.random.randint(-7398,-3479)/100
-                    # as_lat=np.random.randint(-3375,527)/100
-                    # as_lng=np.random.randint(-7398,-3479)/100
                     idx_ac=np.random.randint(0,len(lat_lng)-1)
                     idx_as=np.random.randint(0,len(lat_lng)-1)
                     ac_lat,ac_lng=lat_lng.loc[idx_ac,'lat'],lat_lng.loc[idx_ac,'lng']
                     as_lat,as_lng=lat_lng.loc[idx_as,'lat'],lat_lng.loc[idx_as,'lng']
-
-                    # clus=km.predict([[ac_lat,ac_lng],[as_lat,as_lng]])
-                    # ac_clus=clus[0]
-                    # as_clus=clus[1]
                     as_clus=y[idx_as]
                     ac_clus=y[idx_ac]
                     
@@ -297,19 +263,56 @@ def get_cluster_info(n_clicks,df):
     [State(component_id='data-generated',component_property='data'),
     State(component_id='n-cluster',component_property='value')]
 )
-def get_cluster_map(n_clicks,df,n):
+def get_cluster_map(n_clicks,df,cluster):
     if n_clicks==0:
         raise dash.exceptions.PreventUpdate
     else:
-        km=pickle.load(open(f'../KMeans_{n}.model','rb'))
         df=pd.DataFrame(df)
-        fig,ax=subplots(1,1)
-        brazil.plot(color='whitesmoke',edgecolor='black',figsize=(16,8),ax=ax)
-        sns.scatterplot(df['seller_lng'],df['seller_lat'],ax=ax,color='green')
-        sns.scatterplot(df['customer_lng'],df['customer_lat'],ax=ax,color='red')
-        sns.scatterplot([i[0] for i in km.cluster_centers_],[i[1] for i in km.cluster_centers_],marker='*',s=500,ax=ax,color='b')
-        legend(['Sellers','Customer','Warehouse'])
-        return mpl_to_plotly(fig)
+        labels=df['cluster'].unique()
+        centroids=pickle.load(open(f'model_data_dump/km3_iter8.ctr','rb'))
+        
+#         fig,ax=subplots(1,1)
+#         brazil.plot(color='whitesmoke',edgecolor='black',figsize=(16,8),ax=ax)
+#         sns.scatterplot(df['seller_lng'],df['seller_lat'],ax=ax,color='green')
+#         sns.scatterplot(df['customer_lng'],df['customer_lat'],ax=ax,color='red')
+#         sns.scatterplot([i[0] for lbl,i in enumerate(centroids) if lbl in labels],[i[1] for lbl,i in enumerate(centroids) if lbl in labels],marker='*',s=500,ax=ax,color='b')
+#         legend(['Sellers','Customer','Warehouse'])
+#         return mpl_to_plotly(fig)
+        scatter=[]
+        for label in labels:
+            scatter.append(go.Scattermapbox(dict(
+                lat=[centroids[label,1]],
+                lon=[centroids[label,0]],
+                text=f'Cluster Center#{label}',
+                name=f'Cluster Center#{label}',
+                marker={'color':'blue','symbol':'star'}
+            )))
+            for user,color in zip(['seller','customer'],['green','red']):
+                scatter.append(go.Scattermapbox(dict(
+                    lat=[i for i in df[df['cluster']==label][user+'_lat']],
+                    lon=[i for i in df[df['cluster']==label][user+'_lng']],
+                    text=user+'(cluster:'+str(label)+')',
+                    name=user+'(cluster:'+str(label)+')',
+                    marker={'color':color}
+                )))
+
+        
+        figure = {
+                'data':scatter,
+                'layout':dict(
+                    hovermode='closest',
+                    mapbox=go.layout.Mapbox(
+                        bearing=0,
+                        center=go.layout.mapbox.Center(
+                            lat=-15,
+                            lon=-56
+                        ),
+                        pitch=0,
+                        zoom=1.5
+                    )
+                )  
+            }
+        return figure
 
 @app.callback(
     Output(component_id='simulation-output',component_property='children'),

@@ -1,5 +1,6 @@
 import mlrose
 import numpy as np
+# from itertools import permutation
 
 def TSP(ln,coords):
 
@@ -20,13 +21,10 @@ def TSP(ln,coords):
                 j=np.random.randint(1,len(coord))-1 
                 if j not in n:
                     n.append(j)
-#         print(n)
-#         try:
         coords_list=[i for idx,i in enumerate(coord) if idx in n]
-#             print(coords_list)
-
         for i in coords_list:
             coord.remove(i)
+
         # Initialize fitness function object using coords_list
         fitness_coords = mlrose.TravellingSales(coords = coords_list)
 
@@ -38,20 +36,8 @@ def TSP(ln,coords):
         for i,j in zip(best_state[:-1],best_state[1:]):
             distance+=np.sqrt((coords_list[i][0]-coords_list[j][0])**2+(coords_list[i][1]-coords_list[j][1])**2)
         points[iters]=[coords_list[i] for i in best_state]
-#             print(coords_list)     
-#             print('d')
-        # print(iters)
-        # print(distance)
+
         dic[iters]=distance
         distance_sum+=(distance)
-        # print(distance_sum)
-            # best_fitness
-#         except:
-#             pass
-        # print(len(coord))
+
     return dic,iters,distance_sum,points
-# asp=[[np.random.randint(-100,100),np.random.randint(-100,100)] for i in range(10)]
-# print(asp)
-# iters,distance=TSP(3,asp)
-# print(iters)
-# print(distance)

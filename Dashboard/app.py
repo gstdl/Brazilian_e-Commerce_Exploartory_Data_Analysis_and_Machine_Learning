@@ -7,15 +7,9 @@ import plotly.graph_objs as go
 import dash_table
 from dash.dependencies import Input, Output, State
 import pickle
-import seaborn as sns
-from matplotlib.pyplot import legend,gcf,subplots
-from plotly.tools import mpl_to_plotly
 from src.TSP import TSP
 from imblearn.over_sampling import SMOTE
-import geopandas as gpd
 
-world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-brazil = world[world['name']=='Brazil']
 l_l =pd.read_csv('lat_lng.csv')
 
 df=pd.DataFrame({'customer_lat':['Please' for i in range(1000)],
@@ -24,11 +18,6 @@ df=pd.DataFrame({'customer_lat':['Please' for i in range(1000)],
     'seller_lng':['First' for i in range(1000)],
     'cluster':['!' for i in range(1000)]
 }).reset_index()
-
-def brazilplot():
-    brazil.plot()
-    fig=gcf()
-    return mpl_to_plotly(fig)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -127,20 +116,11 @@ app.layout = html.Div(children = [
         html.Div(className='col-3')
     ]),
     html.Div(className='row',children=[
-        # html.Div(children=[
-        #     dcc.Graph(
-        #         className='row center',
-        #         id='map2',
-        #         figure=brazilplot()
-        #     )
-        # ])
         html.Div(className = 'col-12',children = dcc.Graph(
             id = 'map2',
             config=dict(mapboxAccessToken='pk.eyJ1IjoiZ3N0ZGwiLCJhIjoiY2szOHpvcGM4MGJ3MDNibDMwNWVnam81ZSJ9.UDewXUFso2Tb9S3OlWfsmg'),
             figure = {
                 'data': [go.Scattermapbox(dict(
-                    # lat=[-15],
-                    # lon=[-56],
                 ))
                 ],
                 'layout':dict(
@@ -270,14 +250,6 @@ def get_cluster_map(n_clicks,df,cluster):
         df=pd.DataFrame(df)
         labels=df['cluster'].unique()
         centroids=pickle.load(open(f'model_data_dump/km3_iter8.ctr','rb'))
-        
-#         fig,ax=subplots(1,1)
-#         brazil.plot(color='whitesmoke',edgecolor='black',figsize=(16,8),ax=ax)
-#         sns.scatterplot(df['seller_lng'],df['seller_lat'],ax=ax,color='green')
-#         sns.scatterplot(df['customer_lng'],df['customer_lat'],ax=ax,color='red')
-#         sns.scatterplot([i[0] for lbl,i in enumerate(centroids) if lbl in labels],[i[1] for lbl,i in enumerate(centroids) if lbl in labels],marker='*',s=500,ax=ax,color='b')
-#         legend(['Sellers','Customer','Warehouse'])
-#         return mpl_to_plotly(fig)
         scatter=[]
         for label in labels:
             scatter.append(go.Scattermapbox(dict(
@@ -296,7 +268,6 @@ def get_cluster_map(n_clicks,df,cluster):
                     marker={'color':color}
                 )))
 
-        
         figure = {
                 'data':scatter,
                 'layout':dict(
@@ -339,25 +310,28 @@ def ysp(n_clicks,df,stops,cluster):
             d=df[df['cluster']==cluster]
             sel_dic[cluster],sel_iter[cluster],sel_dist[cluster],sel_ord[cluster]=TSP(stops,[[d.loc[i,'seller_lat'],d.loc[i,'seller_lng']] for i in d.index])
             cus_dic[cluster],cus_iter[cluster],cus_dist[cluster],cus_ord[cluster]=TSP(stops,[[d.loc[i,'customer_lat'],d.loc[i,'customer_lng']] for i in d.index])
-            s=[*s,html.H1(html.Strong(f'Details for warehouse {cluster}:')),
-            html.H4(f'Distance Traveled Picking up Items = {sel_dist[cluster]}'),
-            html.H4(f'Stops During Item Pick Up = {sel_iter[cluster]}'),
-            html.P(),
-            html.P('Details of distance traveled before each stop is shown below.'),
-            html.P(f'Sequence= {sel_ord[cluster]}'),
-            html.P(f' Distances= {sel_dic[cluster]}'),
-            html.P(),html.P(),
-            html.H4(f'Distance Traveled Delivering Items = {cus_dist[cluster]}'),
-            html.H4(f'Stops During Item Delivery = {cus_iter[cluster]}'),
-            html.P(f'Details of distance traveled before each stop is shown below.'),
-            html.P(),
-            html.P(f'Sequence= {cus_ord[cluster]}'),
-            html.P(f' Distances= {cus_dic[cluster]}'),html.P(),html.P(),
-            html.P()
+            s=[
+                *s,
+                html.H1(html.Strong(f'Details for warehouse {cluster}:')),
+                html.H4(f'Distance Traveled Picking up Items = {sel_dist[cluster]}'),
+                html.H4(f'Stops During Item Pick Up = {sel_iter[cluster]}'),
+                html.P(),
+                html.P('Details of distance traveled before each stop is shown below.'),
+                html.P(f'Sequence= {sel_ord[cluster]}'),
+                html.P(f' Distances= {sel_dic[cluster]}'),
+                html.P(),html.P(),
+                html.H4(f'Distance Traveled Delivering Items = {cus_dist[cluster]}'),
+                html.H4(f'Stops During Item Delivery = {cus_iter[cluster]}'),
+                html.P(f'Details of distance traveled before each stop is shown below.'),
+                html.P(),
+                html.P(f'Sequence= {cus_ord[cluster]}'),
+                html.P(f' Distances= {cus_dic[cluster]}'),html.P(),html.P(),
+                html.P()
             ]
-        s=[*s,
-        html.H2(f'TOTAL DISTANCE TRAVELED PICKING UP ITEMS = {sum(list(sel_dist.values()))}'),html.P(),html.P(),
-        html.H2(f'TOTAL DISTANCE TRAVELED DELIVERING ITEMS = {sum(list(cus_dist.values()))}'),html.P(),html.P()
+        s=[
+            *s,
+            html.H2(f'TOTAL DISTANCE TRAVELED PICKING UP ITEMS = {sum(list(sel_dist.values()))}'),html.P(),html.P(),
+            html.H2(f'TOTAL DISTANCE TRAVELED DELIVERING ITEMS = {sum(list(cus_dist.values()))}'),html.P(),html.P()
         ]
         return s
 

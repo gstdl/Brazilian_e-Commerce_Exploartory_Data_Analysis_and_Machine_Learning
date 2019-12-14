@@ -120,7 +120,7 @@ app.layout = html.Div(children = [
     html.Div(className='row',children=[
         html.Div(className = 'col-12',children = dcc.Graph(
             id = 'map2',
-            config=dict(mapboxAccessToken='pk.eyJ1IjoiZ3N0ZGwiLCJhIjoiY2szOHpvcGM4MGJ3MDNibDMwNWVnam81ZSJ9.UDewXUFso2Tb9S3OlWfsmg'),
+            config=dict(mapboxAccessToken={Enter your own token}),
             figure = {
                 'data': [go.Scattermapbox(dict(
                 ))

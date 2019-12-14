@@ -23,6 +23,8 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+server = app.server
+
 app.layout = html.Div(children = [
     html.H1('Warehouse Placement Simulator'),
     html.P('Created by: Gusti Adli Anshari'), 
@@ -257,7 +259,9 @@ def get_cluster_map(n_clicks,df,cluster):
                 lon=[centroids[label,0]],
                 text=f'Cluster Center#{label}',
                 name=f'Cluster Center#{label}',
-                marker={'color':'blue','symbol':'star'}
+                marker={'color':'blue','symbol':'star',
+                'size':12
+                }
             )))
             for user,color in zip(['seller','customer'],['green','red']):
                 scatter.append(go.Scattermapbox(dict(

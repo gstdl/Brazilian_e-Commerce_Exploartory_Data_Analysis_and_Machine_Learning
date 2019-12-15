@@ -1,10 +1,10 @@
 # Brazilian e-Commerce Exploartory Data Analysis and Machine_Learning
 This Repository is made to store data about my final project as a requirement to graduate from Data Science Job Connector Program at Purwadhika Startup &amp; Coding School.
 
-Notes:
-1. Feel free to open and run the codes in google colab. The datasets are available in Kaggle and you are required to use your own Kaggle API key to access the datasets. [Click here to obtain your key](https://github.com/Kaggle/kaggle-api#api-credentials)
-2. The dashboard for this project is available [here](https://gstdl-warehouse-sim.herokuapp.com).
-3. If you are cloning this project, please use your own API keys when they are required.
+> Notes:
+> 1. Feel free to open and run the codes in google colab. The datasets are available in Kaggle and you are required to use your own Kaggle API key to access the datasets ([Click here to obtain your key](https://github.com/Kaggle/kaggle-api#api-credentials)).
+> 2. The dashboard for this project is available [here](https://gstdl-warehouse-sim.herokuapp.com).
+> 3. If you are cloning this project, please use your own API keys when they are required.
 
 ## A Weird Final Project
 This final project contains a quite comprehensive Exploratory Data Analysis (EDA) but nearly none of the EDA is involved in the machine learning process. 
@@ -70,5 +70,5 @@ There are several limitations considered in this final project which are as foll
 4. Build a RFM analysis based on the customers data.
 
 ## Updates
-_12/14/2019_ Deployed the dashboard on [Heroku](https://gstdl-warehouse-sim.herokuapp.com)
+- _12/14/2019_ Deployed the dashboard on [Heroku](https://gstdl-warehouse-sim.herokuapp.com)
 
